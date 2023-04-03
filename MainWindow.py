@@ -7,8 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from logic import add_combo_items
-from ipconfig import get_interfaces_name
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -49,12 +48,15 @@ class Ui_MainWindow(object):
         self.sniff_button.setObjectName("sniff_button")
         self.horizontalLayout.addWidget(self.sniff_button)
         self.pause_button = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pause_button.setEnabled(True)
         self.pause_button.setObjectName("pause_button")
         self.horizontalLayout.addWidget(self.pause_button)
         self.stop_button = QtWidgets.QPushButton(parent=self.groupBox)
+        self.stop_button.setEnabled(True)
         self.stop_button.setObjectName("stop_button")
         self.horizontalLayout.addWidget(self.stop_button)
         self.resniff_button = QtWidgets.QPushButton(parent=self.groupBox)
+        self.resniff_button.setEnabled(True)
         self.resniff_button.setObjectName("resniff_button")
         self.horizontalLayout.addWidget(self.resniff_button)
         self.interfaces_combo = QtWidgets.QComboBox(parent=self.groupBox)
@@ -110,6 +112,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_2.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.sniff_button.toggled['bool'].connect(self.pause_button.setEnabled) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -127,13 +130,11 @@ class Ui_MainWindow(object):
         self.actionclose.setText(_translate("MainWindow", "close"))
 
 
-# if __name__ == "__main__":
-#     import sys
-#     app = QtWidgets.QApplication(sys.argv)
-#     MainWindow = QtWidgets.QMainWindow()
-#     ui = Ui_MainWindow()
-#     ui.setupUi(MainWindow)
-#     interfaces_list = get_interfaces_name()
-#     add_combo_items(interfaces_list, ui)
-#     MainWindow.show()
-#     sys.exit(app.exec())
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec())

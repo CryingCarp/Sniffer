@@ -75,6 +75,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pause_button">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string>暂停</string>
           </property>
@@ -82,6 +85,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="stop_button">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string>停止</string>
           </property>
@@ -89,6 +95,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="resniff_button">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string>重新抓包</string>
           </property>
@@ -187,5 +196,22 @@
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sniff_button</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pause_button</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>164</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>227</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
