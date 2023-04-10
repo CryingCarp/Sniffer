@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QMainWindow, QApplication
 # from logic import add_combo_items
 from ipconfig import get_interfaces_name
 import capture_packets
+from MyThread import MyThread
 
 class SnifferWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -12,24 +13,23 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.display_interfaces_list()
         self.show()
 
-        self.pause_button.setEnabled(False)
-        self.stop_button.setEnabled(False)
-        self.resniff_button.setEnabled(False)
+
 
         self.sniff_button.clicked.connect(self.start_sniff)
 
+
+    def set_captured_view_header(self):
+        self.captured_view.setVerticalHeader()
     def display_interfaces_list(self):
         interifaces_list = get_interfaces_name()
         self.interfaces_combo.addItems(interifaces_list)
-
 
     def start_sniff(self):
         self.sniff_button.setEnabled(False)
         self.pause_button.setEnabled(True)
         self.resniff_button.setEnabled(True)
         self.stop_button.setEnabled(True)
-        selected_interface = self.interfaces_combo.currentData()
-        packets_list = capture_packets.sniff_all_packets(selected_interface)
+        self.thread = MyThread(self.captured_view, )
 
 
     def display_captured_packets(self):

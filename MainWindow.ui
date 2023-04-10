@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1325</width>
-    <height>801</height>
+    <width>933</width>
+    <height>741</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -41,7 +41,7 @@
         <item>
          <widget class="QPushButton" name="pause_button">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="text">
            <string>暂停</string>
@@ -51,7 +51,7 @@
         <item>
          <widget class="QPushButton" name="stop_button">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="text">
            <string>停止</string>
@@ -61,7 +61,7 @@
         <item>
          <widget class="QPushButton" name="resniff_button">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="text">
            <string>重新抓包</string>
@@ -99,18 +99,78 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QTreeView" name="treeView">
-        <property name="sortingEnabled">
+      <item row="4" column="0">
+       <widget class="QTreeWidget" name="packet_view">
+        <property name="mouseTracking">
          <bool>true</bool>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
+        </property>
+        <property name="allColumnsShowFocus">
+         <bool>true</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="headerHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>新建列</string>
+         </property>
+        </column>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QListView" name="listView"/>
+      <item row="4" column="1">
+       <widget class="QColumnView" name="hex_view"/>
       </item>
-      <item row="2" column="1">
-       <widget class="QListView" name="listView_2"/>
+      <item row="1" column="0" colspan="2">
+       <widget class="QTableWidget" name="captured_view">
+        <column>
+         <property name="text">
+          <string>序号</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>时间</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>源地址</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>目的地址</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>协议</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>长度</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </item>
@@ -121,8 +181,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1325</width>
-     <height>22</height>
+     <width>933</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -159,22 +219,5 @@
   </action>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>sniff_button</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pause_button</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>103</x>
-     <y>164</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>179</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
