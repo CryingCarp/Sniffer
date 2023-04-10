@@ -17,14 +17,9 @@ def print_hex_on_monitor(packet):
 
 # 在display窗口打印输出
 
-def sniff_all_packets(interface_name='en0'):
+def sniff_all_packets(interface_name='en0', ):
     return sniff(iface=interface_name, count=5)
 
 
 def print_on_monitor(packet):
     print(packet.summary())
-
-
-packets_list = sniff_all_packets()
-for packet in packets_list:
-    print_hex_on_monitor(packet)
