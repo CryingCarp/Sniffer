@@ -1,7 +1,7 @@
 import sys
 from MainWindow import Ui_MainWindow
 from PyQt6.QtWidgets import QMainWindow, QApplication
-# from logic import add_combo_items
+from logic import add_combo_items
 from ipconfig import get_interfaces_name
 import capture_packets
 from MyThread import MyThread
@@ -12,8 +12,6 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.display_interfaces_list()
         self.show()
-
-
 
         self.sniff_button.clicked.connect(self.start_sniff)
 
@@ -29,7 +27,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.pause_button.setEnabled(True)
         self.resniff_button.setEnabled(True)
         self.stop_button.setEnabled(True)
-        self.thread = MyThread(self.captured_view, )
+        # self.thread = MyThread(self.captured_view, self.captured_view, interface_name = self.interfaces_combo.currentData())
 
 
     def display_captured_packets(self):
