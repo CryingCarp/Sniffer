@@ -78,7 +78,7 @@ class Ui_MainWindow(object):
         self.captured_view.setAlternatingRowColors(True)
         self.captured_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.captured_view.setShowGrid(False)
-        self.captured_view.setRowCount(10)
+        self.captured_view.setRowCount(0)
         self.captured_view.setObjectName("captured_view")
         self.captured_view.setColumnCount(6)
         item = QtWidgets.QTableWidgetItem()

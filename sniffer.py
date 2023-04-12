@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QAbstractItemView, QTable
 from MyThread import MyThread
 from ipconfig import get_interfaces_name
 from scapy.all import *
+from Packet import Packet_Item
 
 class SnifferWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -39,10 +40,10 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.captured_view.clearContents()
         self.thread.start()
 
-    def update_packets_list(self, packet):
+    def update_packets_list(self, packet_item = Packet_Item):
         current_row_count = self.captured_view.rowCount()
         self.captured_view.setRowCount(current_row_count + 1)
-        self.captured_view.setItem(current_row_count, 0, packet)
+        self.captured_view.setItem(current_row_count, 0, packet_item)
         # self.captured_view.setItem(current_row_count, 1, packet)
         # self.captured_view.setItem(current_row_count, 2, packet.)
         # self.captured_view.setItem(current_row_count, 3, current_row_count + 1)
