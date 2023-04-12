@@ -1,24 +1,12 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QTableWidget
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6 import QtCore
+from PyQt6.QtWidgets import QTableWidgetItem
 from scapy.all import *
 
-class MyThread(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self, table_widget = QTableWidget(), interface_name = 'en0'):
-        super().__init__()
-        self.table_widget = table_widget
-        self.interface_name = interface_name
+class MyThread(QtCore.QThread):
+    task_finished = QtCore.pyqtSignal(str)
 
     def run(self):
-        self.packets_list = sniff(iface = self.interface_name, count = 5, prn = self.update)
-        self.finished.emit()
+        packets_list = sniff(iface = 'en0', prn = self.packet_callback, count = 50)
 
-    def update(self, packet):
-
-        while packet.payload != 0:
-            src_str = packet.src + "/"
-            dst_str = packet.dst + "/"
-            packet = packet.payload
-        self.table_widget.insertRow(-1)
+    def packet_callback(self, packet):
+        self.task_finished.emit(str(packet.summary()))
