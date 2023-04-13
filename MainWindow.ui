@@ -164,6 +164,9 @@
         <attribute name="horizontalHeaderMinimumSectionSize">
          <number>25</number>
         </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
@@ -201,6 +204,11 @@
         <column>
          <property name="text">
           <string>长度</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>info</string>
          </property>
         </column>
        </widget>

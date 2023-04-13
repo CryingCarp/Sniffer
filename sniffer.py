@@ -1,10 +1,10 @@
 import sys
 from MainWindow import Ui_MainWindow
-from PyQt6.QtWidgets import QMainWindow, QApplication, QAbstractItemView, QTableWidget, QTableWidgetItem
-from MyThread import MyThread
+from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView
+from logic import add_combo_items
 from ipconfig import get_interfaces_name
-from scapy.all import *
-from Packet import Packet_Item
+import capture_packets
+from MyThread import MyThread
 
 class SnifferWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -13,43 +13,51 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.display_interfaces_list()
         self.show()
 
-        #初始化抓包窗口
-        self.captured_view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.captured_view.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        # self.captured_view.resizeColumnToContents()
+        # 初始化captured_view窗口
+        # self.captured_view.setEditTriggers(QAbstractItemView.)
+        self.captured_view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.captured_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
-        # 初始化抓包线程
-        self.thread = MyThread()
-        self.thread.task_finished.connect(self.update_packets_list)
-        self.sniff_button.clicked.connect(self.start_sniff_thread)
+        self.sniff_button.clicked.connect(self.start_sniff)
+
 
     def set_captured_view_header(self):
         self.captured_view.setVerticalHeader()
-
     def display_interfaces_list(self):
         interifaces_list = get_interfaces_name()
         self.interfaces_combo.addItems(interifaces_list)
 
-    def start_sniff_thread(self):
-        # 设置按钮
+    def start_sniff(self):
         self.sniff_button.setEnabled(False)
         self.pause_button.setEnabled(True)
         self.resniff_button.setEnabled(True)
         self.stop_button.setEnabled(True)
-        # 开始抓包前清除所有数据
-        self.captured_view.clearContents()
+        # self.thread = MyThread(self.captured_view, self.captured_view, interface_name = self.interfaces_combo.currentData())
+        self.thread = MyThread()
+        self.thread.task_finished.connect(self.update_table_widget)
         self.thread.start()
 
-    def update_packets_list(self, packet_item = Packet_Item):
-        current_row_count = self.captured_view.rowCount()
-        self.captured_view.setRowCount(current_row_count + 1)
-        self.captured_view.setItem(current_row_count, 0, packet_item)
-        # self.captured_view.setItem(current_row_count, 1, packet)
-        # self.captured_view.setItem(current_row_count, 2, packet.)
-        # self.captured_view.setItem(current_row_count, 3, current_row_count + 1)
-        # self.captured_view.setItem(current_row_count, 4, current_row_count + 1)
-        # self.captured_view.setItem(current_row_count, 5, current_row_count + 1)
+    def display_captured_packets(self):
+        return
 
+    def update_table_widget(self, number, time, source, destination, protocal, length, info):
+        row = self.captured_view.rowCount()
+        self.captured_view.insertRow(row)
+        number_item = QTableWidgetItem(number)
+        time_item = QTableWidgetItem(time)
+        source_item = QTableWidgetItem(source)
+        destination_item = QTableWidgetItem(destination)
+        protocal_item = QTableWidgetItem(protocal)
+        length_item = QTableWidgetItem(length)
+        info_item = QTableWidgetItem(info)
+        self.captured_view.setItem(row, 0, number_item)
+        self.captured_view.setItem(row, 1, time_item)
+        self.captured_view.setItem(row, 2, source_item)
+        self.captured_view.setItem(row, 3, destination_item)
+        self.captured_view.setItem(row, 4, protocal_item)
+        self.captured_view.setItem(row, 5, length_item)
+        self.captured_view.setItem(row, 6, info_item)
+        self.captured_view.resizeColumnsToContents()
 
 
 if __name__ == "__main__":
