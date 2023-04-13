@@ -5,6 +5,8 @@ from logic import add_combo_items
 from ipconfig import get_interfaces_name
 import capture_packets
 from MyThread import MyThread
+from scapy.all import hexdump
+
 
 class SnifferWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -20,9 +22,11 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
 
         self.sniff_button.clicked.connect(self.start_sniff)
 
+        self.captured_view.itemClicked.connect(self.display_current_packet)
 
     def set_captured_view_header(self):
         self.captured_view.setVerticalHeader()
+
     def display_interfaces_list(self):
         interifaces_list = get_interfaces_name()
         self.interfaces_combo.addItems(interifaces_list)
@@ -37,9 +41,18 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.thread.task_finished.connect(self.update_table_widget)
         self.thread.start()
 
-    def display_captured_packets(self):
+    # 展示包
+    def display_current_packet(self):
+        row = self.captured_view.currentRow()
+        packet = self.thread.packets_list[row]
+        self.hex_browser.clear()
+        self.packet_browser.clear()
+        self.hex_browser.setText(hexdump(packet, dump = True))
+        self.packet_browser.setText(packet.show(dump = True))
         return
 
+
+    # 更新table函数
     def update_table_widget(self, number, time, source, destination, protocal, length, info):
         row = self.captured_view.rowCount()
         self.captured_view.insertRow(row)

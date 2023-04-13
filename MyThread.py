@@ -7,7 +7,7 @@ class MyThread(QtCore.QThread):
 
     def run(self):
         self.count = 0
-        packets_list = sniff(iface = 'en0', prn = self.packet_callback, count = 1000)
+        self.packets_list = sniff(iface = 'en0', prn = self.packet_callback, count = 50)
 
     def packet_callback(self, packet):
         self.count += 1
