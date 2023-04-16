@@ -33,6 +33,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         # 连接信号槽函数
         self.sniff_button.clicked.connect(self.sniff_button_logic)
         self.pause_button.clicked.connect(self.pause_button_logic)
+        self.stop_button.clicked.connect(self.stop_button_logic)
         self.captured_view.itemClicked.connect(self.display_current_packet)
 
     def set_captured_view_header(self):
@@ -70,7 +71,9 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         sniff_thread.start()
 
     def sniff_packet(self):
-        sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText())
+        global thread_stop
+        sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(), stop_filter = lambda pkt: thread_stop.is_set()
+              )
 
     # 数据包展示
     def add_packet(self, packet):
@@ -113,7 +116,6 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             sniffer.captured_view.setItem(row, 4, QTableWidgetItem(protocal_name))
             sniffer.captured_view.setItem(row, 5, QTableWidgetItem(length))
             sniffer.captured_view.setItem(row, 6, QTableWidgetItem(info))
-            self.captured_view.resizeColumnsToContents()
 
     def display_current_packet(self):
         global packet_list
@@ -137,13 +139,15 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             thread_pause.clear()
             self.pause_button.setText('暂停')
 
-#
-#
-# # 停止逻辑的按钮
-# def stop_button(sniffer=SnifferWindow()):
-#     thread_stop.is_set()
-#     sniffer.resniff_button.setEnabled(True)
-#     pass
+
+    # 停止逻辑的按钮
+    def stop_button_logic(self):
+        global thread_stop
+        thread_stop.set()
+        self.stop_button.setEnabled(False)
+        self.resniff_button.setEnabled(True)
+        self.sniff_button.setEnabled(True)
+        self.pause_button.setEnabled(False)
 
 
 if __name__ == "__main__":
