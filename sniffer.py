@@ -13,6 +13,7 @@ from scapy.layers.l2 import *
 packet_list = []
 # 捕获的报文总数
 packet_count = 0
+
 thread_stop = threading.Event()
 thread_pause = threading.Event()
 
@@ -31,6 +32,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
 
         # 连接信号槽函数
         self.sniff_button.clicked.connect(self.sniff_button_logic)
+        self.pause_button.clicked.connect(self.pause_button_logic)
         # self.captured_view.itemClicked.connect(self.display_current_packet)
 
     def set_captured_view_header(self):
@@ -67,15 +69,15 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         sniff_thread = threading.Thread(target=self.sniff_packet, name='sniff_thread')
         sniff_thread.start()
 
-    def sniff_packet(self, iface = 'en0'):
-        iface = self.interfaces_combo.currentText()
-        sniff(prn=self.add_packet, iface=iface)
+    def sniff_packet(self):
+        sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText())
 
     # 数据包展示
     def add_packet(self, packet):
         global packet_list
         global packet_count
-        if not thread_stop.is_set():
+        if not thread_pause.is_set():
+            print(thread_pause)
             packet_list.append(packet)
             packet_count += 1
 
@@ -114,19 +116,19 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             sniffer.captured_view.setItem(row, 6, QTableWidgetItem(info))
 
 
-# # 暂停按钮的逻辑
-# def pause_button(sniffer=SnifferWindow()):
-#     # 如果当前按钮状态为暂停的话
-#     if sniffer.pause_button.objectName() == '暂停':
-#         thread_pause.is_set()
-#         sniffer.pause_button.setText('继续')
-#
-#     # 如果当前按钮状态为继续的话
-#     elif sniffer.pause_button.objectName() == '继续':
-#         thread_pause.clear()
-#         sniffer.pause_button.setText('暂停')
-#
-#     return
+    # # 暂停按钮的逻辑
+    def pause_button_logic(self):
+        global thread_pause
+        # 如果当前按钮状态为暂停的话
+        if self.pause_button.text() == '暂停':
+            thread_pause.set()
+            self.pause_button.setText('继续')
+
+        # 如果当前按钮状态为继续的话
+        elif self.pause_button.text() == '继续':
+            thread_pause.clear()
+            self.pause_button.setText('暂停')
+
 #
 #
 # # 停止逻辑的按钮
