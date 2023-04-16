@@ -222,6 +222,12 @@
           <height>300</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <kerning>false</kerning>
+         </font>
+        </property>
        </widget>
       </item>
      </layout>
