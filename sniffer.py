@@ -1,11 +1,22 @@
 import sys
+import threading
 from MainWindow import Ui_MainWindow
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView
-from logic import add_combo_items
 from ipconfig import get_interfaces_name
-import capture_packets
 from MyThread import MyThread
-from scapy.all import hexdump
+from scapy.all import *
+
+from scapy.layers.inet import *
+from scapy.layers.inet6 import IPv6
+from scapy.layers.l2 import *
+
+# 捕获的报文列表
+packet_list = []
+# 捕获的报文总数
+packet_count = 0
+print("123")
+thread_stop = threading.Event()
+thread_pause = threading.Event()
 
 
 class SnifferWindow(QMainWindow, Ui_MainWindow):
@@ -20,57 +31,110 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.captured_view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.captured_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
-        self.sniff_button.clicked.connect(self.start_sniff)
-
-        self.captured_view.itemClicked.connect(self.display_current_packet)
+        # 连接信号槽函数
+        self.sniff_button.clicked.connect(self.sniff_button_logic)
+        # self.captured_view.itemClicked.connect(self.display_current_packet)
 
     def set_captured_view_header(self):
         self.captured_view.setVerticalHeader()
 
+    # 下拉框添加网卡
     def display_interfaces_list(self):
         interifaces_list = get_interfaces_name()
         self.interfaces_combo.addItems(interifaces_list)
 
-    def start_sniff(self):
+    # 开始嗅探按钮的逻辑
+    def sniff_button_logic(self):
+        global packet_list
+        global packet_count
+
+        # 改变按钮状态
         self.sniff_button.setEnabled(False)
-        self.pause_button.setEnabled(True)
-        self.resniff_button.setEnabled(True)
         self.stop_button.setEnabled(True)
-        # self.thread = MyThread(self.captured_view, self.captured_view, interface_name = self.interfaces_combo.currentData())
-        self.thread = MyThread()
-        self.thread.task_finished.connect(self.update_table_widget)
-        self.thread.start()
+        self.pause_button.setEnabled(True)
+        self.resniff_button.setEnabled(False)
 
-    # 展示包
-    def display_current_packet(self):
-        row = self.captured_view.currentRow()
-        packet = self.thread.packets_list[row]
-        self.hex_browser.clear()
-        self.packet_browser.clear()
-        self.hex_browser.setText(hexdump(packet, dump = True))
-        self.packet_browser.setText(packet.show(dump = True))
-        return
+        # 如果之前的抓包线程终止,将所有状态初始化
+        if thread_stop.is_set():
+            packet_list.clear()
+            packet_count = 0
+            self.captured_view.clear()
+            self.packet_browser.clear()
+            self.hex_browser.clear()
+        else:
+            packet_list.clear()
+            packet_count = 0
+
+        # 开启抓包线程
+        sniff_thread = threading.Thread(target=self.sniff_packet, name='sniff_thread')
+        sniff_thread.start()
+
+    def sniff_packet(self, iface = 'en0'):
+        sniff(prn=self.add_packet, iface=iface)
+
+    # 数据包展示
+    def add_packet(self, packet):
+        global packet_list
+        global packet_count
+        if not thread_stop.is_set():
+            packet_list.append(packet)
+            packet_count += 1
+
+            protocal_list = ['TCP', 'UDP', 'ICMP', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
+            protocal_name = ''
+
+            source = ''
+            destination = ''
+
+            for pn in protocal_list:
+                if pn in packet:
+                    protocal_name = pn
+                    break
+            if protocal_name == 'ARP' or protocal_name == 'Ether':
+                source = packet.src
+                destination = packet.dst
+            else:
+                if 'IPv6' in packet:
+                    source = packet[IPv6].src
+                    destination = packet[IPv6].dst
+                elif 'IP' in packet:
+                    source = packet[IP].src
+                    destination = packet[IP].dst
+            length = str(len(packet))
+            info = packet.summary()
+
+            # 更新抓包窗口
+            row = sniffer.captured_view.rowCount()
+            sniffer.captured_view.insertRow(row)
+            sniffer.captured_view.setItem(row, 0, QTableWidgetItem(str(packet_count)))
+            sniffer.captured_view.setItem(row, 1, QTableWidgetItem(str(packet.time)))
+            sniffer.captured_view.setItem(row, 2, QTableWidgetItem(source))
+            sniffer.captured_view.setItem(row, 3, QTableWidgetItem(destination))
+            sniffer.captured_view.setItem(row, 4, QTableWidgetItem(protocal_name))
+            sniffer.captured_view.setItem(row, 5, QTableWidgetItem(length))
+            sniffer.captured_view.setItem(row, 6, QTableWidgetItem(info))
 
 
-    # 更新table函数
-    def update_table_widget(self, number, time, source, destination, protocal, length, info):
-        row = self.captured_view.rowCount()
-        self.captured_view.insertRow(row)
-        number_item = QTableWidgetItem(number)
-        time_item = QTableWidgetItem(time)
-        source_item = QTableWidgetItem(source)
-        destination_item = QTableWidgetItem(destination)
-        protocal_item = QTableWidgetItem(protocal)
-        length_item = QTableWidgetItem(length)
-        info_item = QTableWidgetItem(info)
-        self.captured_view.setItem(row, 0, number_item)
-        self.captured_view.setItem(row, 1, time_item)
-        self.captured_view.setItem(row, 2, source_item)
-        self.captured_view.setItem(row, 3, destination_item)
-        self.captured_view.setItem(row, 4, protocal_item)
-        self.captured_view.setItem(row, 5, length_item)
-        self.captured_view.setItem(row, 6, info_item)
-        self.captured_view.resizeColumnsToContents()
+# # 暂停按钮的逻辑
+# def pause_button(sniffer=SnifferWindow()):
+#     # 如果当前按钮状态为暂停的话
+#     if sniffer.pause_button.objectName() == '暂停':
+#         thread_pause.is_set()
+#         sniffer.pause_button.setText('继续')
+#
+#     # 如果当前按钮状态为继续的话
+#     elif sniffer.pause_button.objectName() == '继续':
+#         thread_pause.clear()
+#         sniffer.pause_button.setText('暂停')
+#
+#     return
+#
+#
+# # 停止逻辑的按钮
+# def stop_button(sniffer=SnifferWindow()):
+#     thread_stop.is_set()
+#     sniffer.resniff_button.setEnabled(True)
+#     pass
 
 
 if __name__ == "__main__":
