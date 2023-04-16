@@ -33,7 +33,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         # 连接信号槽函数
         self.sniff_button.clicked.connect(self.sniff_button_logic)
         self.pause_button.clicked.connect(self.pause_button_logic)
-        # self.captured_view.itemClicked.connect(self.display_current_packet)
+        self.captured_view.itemClicked.connect(self.display_current_packet)
 
     def set_captured_view_header(self):
         self.captured_view.setVerticalHeader()
@@ -77,7 +77,6 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         global packet_list
         global packet_count
         if not thread_pause.is_set():
-            print(thread_pause)
             packet_list.append(packet)
             packet_count += 1
 
@@ -114,6 +113,15 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             sniffer.captured_view.setItem(row, 4, QTableWidgetItem(protocal_name))
             sniffer.captured_view.setItem(row, 5, QTableWidgetItem(length))
             sniffer.captured_view.setItem(row, 6, QTableWidgetItem(info))
+            self.captured_view.resizeColumnsToContents()
+
+    def display_current_packet(self):
+        global packet_list
+
+        row = self.captured_view.currentRow()
+        packet = packet_list[row - 1]
+        self.hex_browser.setText(hexdump(packet, dump = True))
+
 
 
     # # 暂停按钮的逻辑
