@@ -3,7 +3,6 @@ import threading
 from MainWindow import Ui_MainWindow
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView
 from ipconfig import get_interfaces_name
-from MyThread import MyThread
 from scapy.all import *
 
 from scapy.layers.inet import *
@@ -14,7 +13,6 @@ from scapy.layers.l2 import *
 packet_list = []
 # 捕获的报文总数
 packet_count = 0
-print("123")
 thread_stop = threading.Event()
 thread_pause = threading.Event()
 
@@ -70,6 +68,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         sniff_thread.start()
 
     def sniff_packet(self, iface = 'en0'):
+        iface = self.interfaces_combo.currentText()
         sniff(prn=self.add_packet, iface=iface)
 
     # 数据包展示
