@@ -1,14 +1,12 @@
 import sys
 import threading
 from MainWindow import Ui_MainWindow
-from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView
+from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView, QTreeWidgetItem
 from ipconfig import get_interfaces_name
 from scapy.all import *
 
 from scapy.layers.inet import IP
 from scapy.layers.inet6 import IPv6
-from scapy.layers.http import HTTP
-from scapy.layers.dhcp import DHCP
 from scapy.layers.l2 import *
 
 # 捕获的报文列表
@@ -62,7 +60,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.clear()
             packet_count = 0
             self.captured_view.clear()
-            self.packet_browser.clear()
+            self.treeWidget.clear()
             self.hex_browser.clear()
         else:
             packet_list.clear()
@@ -125,14 +123,34 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         row = self.captured_view.currentRow()
         packet = packet_list[row - 1]
 
+        # 展示窗口初始化
+        self.treeWidget.clear()
+        self.hex_browser.clear()
+
         # 在hex窗口显示二进制报文信息
         self.hex_browser.setText(hexdump(packet, dump=True))
 
         # 在树形窗口按照层次展示报文
-        # lines = (packet.show(dump=True)).split('\n')
-        # for line in lines:
-        #     if line.startwith('#'):
-        #         pass
+        lines = (packet.show(dump=True)).split('\n')
+        current_level = 0
+        for line in lines:
+            if line.startswith('#'):
+                if current_level == 0:
+                    root = QTreeWidgetItem(self.treeWidget)
+                    root.setText(0, line)
+                    self.treeWidget.addTopLevelItem(root)
+                    current_level += 1
+                else:
+                    item = QTreeWidgetItem(self.treeWidget.topLevelItem(current_level))
+                    item.setText(0, line)
+                    self.treeWidget.addTopLevelItem(item)
+                    current_level += 1
+            else:
+                child = QTreeWidgetItem()
+                child.setText(0, line)
+                self.treeWidget.topLevelItem(current_level-1).addChild(child)
+
+
 
     # # 暂停按钮的逻辑
     def pause_button_logic(self):
