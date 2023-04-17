@@ -133,6 +133,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         # 在树形窗口按照层次展示报文
         lines = (packet.show(dump=True)).split('\n')
         current_level = 0
+        current_item = None
         for line in lines:
             if line.startswith('#'):
                 if current_level == 0:
@@ -140,11 +141,17 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                     root.setText(0, line)
                     self.treeWidget.addTopLevelItem(root)
                     current_level += 1
+                    current_item = root
                 else:
                     item = QTreeWidgetItem(self.treeWidget.topLevelItem(current_level))
                     item.setText(0, line)
                     self.treeWidget.addTopLevelItem(item)
                     current_level += 1
+                    current_item = item
+            elif '|#' in line:
+                item = QTreeWidgetItem()
+                item.setText(0, line)
+                current_item.addChild(item)
             else:
                 child = QTreeWidgetItem()
                 child.setText(0, line)
