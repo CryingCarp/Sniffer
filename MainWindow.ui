@@ -35,22 +35,6 @@
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="0">
-       <widget class="QTextBrowser" name="packet_browser">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>500</width>
-          <height>300</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" colspan="3">
        <widget class="QTableWidget" name="captured_view">
         <property name="enabled">
@@ -228,6 +212,18 @@
           <kerning>false</kerning>
          </font>
         </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QTreeWidget" name="treeWidget">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
