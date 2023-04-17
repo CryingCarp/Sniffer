@@ -5,8 +5,10 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableW
 from ipconfig import get_interfaces_name
 from scapy.all import *
 
-from scapy.layers.inet import *
+from scapy.layers.inet import IP
 from scapy.layers.inet6 import IPv6
+from scapy.layers.http import HTTP
+from scapy.layers.dhcp import DHCP
 from scapy.layers.l2 import *
 
 # 捕获的报文列表
@@ -72,7 +74,8 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
 
     def sniff_packet(self):
         global thread_stop
-        sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(), stop_filter = lambda pkt: thread_stop.is_set()
+        sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(),
+              stop_filter=lambda pkt: thread_stop.is_set()
               )
 
     # 数据包展示
@@ -83,7 +86,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.append(packet)
             packet_count += 1
 
-            protocal_list = ['TCP', 'UDP', 'ICMP', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
+            protocal_list = ['HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
             protocal_name = ''
 
             source = ''
@@ -119,12 +122,17 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
 
     def display_current_packet(self):
         global packet_list
-
         row = self.captured_view.currentRow()
         packet = packet_list[row - 1]
-        self.hex_browser.setText(hexdump(packet, dump = True))
 
+        # 在hex窗口显示二进制报文信息
+        self.hex_browser.setText(hexdump(packet, dump=True))
 
+        # 在树形窗口按照层次展示报文
+        # lines = (packet.show(dump=True)).split('\n')
+        # for line in lines:
+        #     if line.startwith('#'):
+        #         pass
 
     # # 暂停按钮的逻辑
     def pause_button_logic(self):
@@ -138,7 +146,6 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         elif self.pause_button.text() == '继续':
             thread_pause.clear()
             self.pause_button.setText('暂停')
-
 
     # 停止逻辑的按钮
     def stop_button_logic(self):
