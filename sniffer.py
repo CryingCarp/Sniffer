@@ -1,5 +1,7 @@
 import sys
 import threading
+import time
+
 from MainWindow import Ui_MainWindow
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QTreeWidgetItem
 from ipconfig import get_interfaces_name
@@ -79,6 +81,8 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                 elif 'IP' in packet:
                     source = packet[IP].src
                     destination = packet[IP].dst
+
+            packet_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(packet.time))
             length = str(len(packet))
             info = packet.summary()
 
@@ -87,7 +91,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             row = sniffer.captured_view.rowCount()
             sniffer.captured_view.insertRow(row)
             sniffer.captured_view.setItem(row, 0, QTableWidgetItem(str(packet_count)))
-            sniffer.captured_view.setItem(row, 1, QTableWidgetItem(str(packet.time)))
+            sniffer.captured_view.setItem(row, 1, QTableWidgetItem(packet_time))
             sniffer.captured_view.setItem(row, 2, QTableWidgetItem(source))
             sniffer.captured_view.setItem(row, 3, QTableWidgetItem(destination))
             sniffer.captured_view.setItem(row, 4, QTableWidgetItem(protocal_name))
