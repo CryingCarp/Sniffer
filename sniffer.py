@@ -2,6 +2,8 @@ import sys
 import threading
 import time
 
+from PyQt6.QtCore import Qt
+
 from MainWindow import Ui_MainWindow
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QTreeWidgetItem
 from ipconfig import get_interfaces_name
@@ -29,6 +31,12 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化captured_view窗口
         # self.captured_view.setEditTriggers(QAbstractItemView.)
+        self.captured_view.setColumnWidth(0, 50)
+        self.captured_view.setColumnWidth(1, 150)
+        self.captured_view.setColumnWidth(2, 150)
+        self.captured_view.setColumnWidth(3, 150)
+        self.captured_view.setColumnWidth(4, 50)
+        self.captured_view.setColumnWidth(5, 50)
         self.captured_view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.captured_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
@@ -61,7 +69,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.append(packet)
             packet_count += 1
 
-            protocal_list = ['ICMPv6', 'HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
+            protocal_list = ['ICMPv6', 'HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', '802.3', 'Unknown']
             protocal_name = ''
 
             source = ''
@@ -71,7 +79,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                 if pn in packet:
                     protocal_name = pn
                     break
-            if protocal_name == 'ARP' or protocal_name == 'Ether':
+            if protocal_name == 'ARP' or protocal_name == 'Ether' or protocal_name == '802.3':
                 source = packet.src
                 destination = packet.dst
             else:
@@ -87,10 +95,12 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             info = packet.summary()
 
             # 更新抓包窗口
-            print(sniffer.captured_view.rowCount())
             row = sniffer.captured_view.rowCount()
             sniffer.captured_view.insertRow(row)
-            sniffer.captured_view.setItem(row, 0, QTableWidgetItem(str(packet_count)))
+            packet_count_item = QTableWidgetItem(str(packet_count))
+            packet_count_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            packet_count_item.setData(Qt.ItemDataRole.DisplayRole, packet_count)
+            sniffer.captured_view.setItem(row, 0, packet_count_item)
             sniffer.captured_view.setItem(row, 1, QTableWidgetItem(packet_time))
             sniffer.captured_view.setItem(row, 2, QTableWidgetItem(source))
             sniffer.captured_view.setItem(row, 3, QTableWidgetItem(destination))
@@ -129,7 +139,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                     current_level += 1
                     current_item = item
             elif '|#' in line:
-                item = QTreeWidgetItem()
+                item = QTreeWidgetItem(current_item)
                 item.setText(0, line)
                 current_item.addChild(item)
             else:
