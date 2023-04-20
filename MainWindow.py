@@ -61,6 +61,7 @@ class Ui_MainWindow(object):
         self.captured_view.setHorizontalHeaderItem(6, item)
         self.captured_view.horizontalHeader().setVisible(True)
         self.captured_view.horizontalHeader().setMinimumSectionSize(25)
+        self.captured_view.horizontalHeader().setSortIndicatorShown(False)
         self.captured_view.horizontalHeader().setStretchLastSection(True)
         self.captured_view.verticalHeader().setVisible(False)
         self.captured_view.verticalHeader().setDefaultSectionSize(25)
