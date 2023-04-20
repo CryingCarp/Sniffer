@@ -192,6 +192,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="save_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>保存数据包</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="BPF">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
