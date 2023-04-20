@@ -30,7 +30,6 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
         # 初始化captured_view窗口
-        # self.captured_view.setEditTriggers(QAbstractItemView.)
         self.captured_view.setColumnWidth(0, 50)
         self.captured_view.setColumnWidth(1, 150)
         self.captured_view.setColumnWidth(2, 150)
@@ -47,8 +46,11 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.captured_view.itemClicked.connect(self.display_current_packet)
         # self.resniff_button.clicked.connect(self.resniff_button_logic)
 
-    def set_captured_view_header(self):
-        self.captured_view.setVerticalHeader()
+    # def set_captured_view_header(self):
+    #     self.captured_view.setVerticalHeader()
+
+    def print_hello(self):
+        print("123")
 
     # 下拉框添加网卡
     def display_interfaces_list(self):
@@ -59,7 +61,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
     def sniff_packet(self):
         global thread_stop
         sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(),
-              stop_filter=lambda pkt: thread_stop.is_set())
+              stop_filter=lambda pkt: thread_stop.is_set(), filter = self.filter.text())
 
     # 数据包展示
     def add_packet(self, packet):
