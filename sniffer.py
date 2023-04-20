@@ -2,14 +2,15 @@ import sys
 import threading
 import time
 
-from PyQt6.QtCore import Qt
-
 from MainWindow import Ui_MainWindow
+
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QDialog, \
     QTreeWidgetItem, QFileDialog
-from ipconfig import get_interfaces_name
-from scapy.all import *
 
+from psutil import net_if_addrs
+
+from scapy.all import sniff
 from scapy.layers.inet import IP
 from scapy.layers.inet6 import IPv6
 from scapy.layers.l2 import *
@@ -48,15 +49,10 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.captured_view.itemClicked.connect(self.display_current_packet)
         # self.resniff_button.clicked.connect(self.resniff_button_logic)
 
-    # def set_captured_view_header(self):
-    #     self.captured_view.setVerticalHeader()
-
-    def print_hello(self):
-        print("123")
 
     # 下拉框添加网卡
     def display_interfaces_list(self):
-        interifaces_list = get_interfaces_name()
+        interifaces_list = net_if_addrs().keys()
         self.interfaces_combo.addItems(interifaces_list)
 
 
