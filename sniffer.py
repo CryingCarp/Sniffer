@@ -160,13 +160,11 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             self.sniff_button.setEnabled(True)
             self.stop_button.setEnabled(False)
             self.pause_button.setEnabled(False)
-            self.resniff_button.setEnabled(True)
             QMessageBox.about(self, "消息提示框", "开启监听失败")
         # 改变按钮状态
         self.sniff_button.setEnabled(False)
         self.stop_button.setEnabled(True)
         self.pause_button.setEnabled(True)
-        self.resniff_button.setEnabled(False)
 
 
     # # 暂停按钮的逻辑
@@ -187,14 +185,9 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         global thread_stop
         thread_stop.set()
         self.stop_button.setEnabled(False)
-        self.resniff_button.setEnabled(True)
         self.sniff_button.setEnabled(True)
         self.pause_button.setEnabled(False)
 
-    # 重新抓包按钮的逻辑
-    # def resniff_button_logic(self):
-    #     #询问是否保存之前的抓包
-    #     self.sniff_button_logic()
 
 
 if __name__ == "__main__":

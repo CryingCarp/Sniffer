@@ -152,16 +152,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="resniff_button">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>重新抓包</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QComboBox" name="interfaces_combo">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
