@@ -97,7 +97,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             # 更新抓包窗口
             row = sniffer.captured_view.rowCount()
             sniffer.captured_view.insertRow(row)
-            packet_count_item = QTableWidgetItem(str(packet_count))
+            packet_count_item = QTableWidgetItem()
             packet_count_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             packet_count_item.setData(Qt.ItemDataRole.DisplayRole, packet_count)
             sniffer.captured_view.setItem(row, 0, packet_count_item)
