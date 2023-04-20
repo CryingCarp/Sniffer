@@ -1,7 +1,7 @@
 import sys
 import threading
 from MainWindow import Ui_MainWindow
-from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QTableWidget, QAbstractItemView, QTreeWidgetItem
+from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QTreeWidgetItem
 from ipconfig import get_interfaces_name
 from scapy.all import *
 
@@ -35,6 +35,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.pause_button.clicked.connect(self.pause_button_logic)
         self.stop_button.clicked.connect(self.stop_button_logic)
         self.captured_view.itemClicked.connect(self.display_current_packet)
+        # self.resniff_button.clicked.connect(self.resniff_button_logic)
 
     def set_captured_view_header(self):
         self.captured_view.setVerticalHeader()
@@ -44,37 +45,11 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         interifaces_list = get_interfaces_name()
         self.interfaces_combo.addItems(interifaces_list)
 
-    # 开始嗅探按钮的逻辑
-    def sniff_button_logic(self):
-        global packet_list
-        global packet_count
-
-        # 改变按钮状态
-        self.sniff_button.setEnabled(False)
-        self.stop_button.setEnabled(True)
-        self.pause_button.setEnabled(True)
-        self.resniff_button.setEnabled(False)
-
-        # 如果之前的抓包线程终止,将所有状态初始化
-        if thread_stop.is_set():
-            packet_list.clear()
-            packet_count = 0
-            self.captured_view.clear()
-            self.treeWidget.clear()
-            self.hex_browser.clear()
-        else:
-            packet_list.clear()
-            packet_count = 0
-
-        # 开启抓包线程
-        sniff_thread = threading.Thread(target=self.sniff_packet, name='sniff_thread')
-        sniff_thread.start()
 
     def sniff_packet(self):
         global thread_stop
         sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(),
-              stop_filter=lambda pkt: thread_stop.is_set()
-              )
+              stop_filter=lambda pkt: thread_stop.is_set())
 
     # 数据包展示
     def add_packet(self, packet):
@@ -108,6 +83,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             info = packet.summary()
 
             # 更新抓包窗口
+            print(sniffer.captured_view.rowCount())
             row = sniffer.captured_view.rowCount()
             sniffer.captured_view.insertRow(row)
             sniffer.captured_view.setItem(row, 0, QTableWidgetItem(str(packet_count)))
@@ -157,6 +133,39 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                 child.setText(0, line)
                 self.treeWidget.topLevelItem(current_level-1).addChild(child)
 
+    # 开始嗅探按钮的逻辑
+    def sniff_button_logic(self):
+        global packet_list
+        global packet_count
+
+        # 如果包的数量不为0，那么开始前询问是否保存
+
+        # 如果之前的抓包线程终止,将所有状态初始化
+        if thread_stop.is_set():
+            packet_list.clear()
+            packet_count = 0
+            thread_stop.clear()
+            self.captured_view.setRowCount(0)
+            self.treeWidget.clear()
+            self.hex_browser.clear()
+        else:
+            packet_list.clear()
+            packet_count = 0
+        # 开启抓包线程
+        try:
+            sniff_thread = threading.Thread(target=self.sniff_packet)
+            sniff_thread.start()
+        except:
+            self.sniff_button.setEnabled(True)
+            self.stop_button.setEnabled(False)
+            self.pause_button.setEnabled(False)
+            self.resniff_button.setEnabled(True)
+            QMessageBox.about(self, "消息提示框", "开启监听失败")
+        # 改变按钮状态
+        self.sniff_button.setEnabled(False)
+        self.stop_button.setEnabled(True)
+        self.pause_button.setEnabled(True)
+        self.resniff_button.setEnabled(False)
 
 
     # # 暂停按钮的逻辑
@@ -172,7 +181,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             thread_pause.clear()
             self.pause_button.setText('暂停')
 
-    # 停止逻辑的按钮
+    # 停止按钮的逻辑
     def stop_button_logic(self):
         global thread_stop
         thread_stop.set()
@@ -180,6 +189,11 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.resniff_button.setEnabled(True)
         self.sniff_button.setEnabled(True)
         self.pause_button.setEnabled(False)
+
+    # 重新抓包按钮的逻辑
+    # def resniff_button_logic(self):
+    #     #询问是否保存之前的抓包
+    #     self.sniff_button_logic()
 
 
 if __name__ == "__main__":
