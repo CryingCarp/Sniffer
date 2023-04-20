@@ -25,12 +25,18 @@
   <property name="windowTitle">
    <string>嗅探器</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
@@ -60,7 +66,7 @@
       <item row="5" column="0">
        <widget class="QTreeWidget" name="treeWidget">
         <property name="autoFillBackground">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <attribute name="headerVisible">
          <bool>false</bool>
@@ -233,6 +239,9 @@
             <width>300</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
           </property>
          </widget>
         </item>
