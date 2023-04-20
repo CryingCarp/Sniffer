@@ -145,6 +145,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.clear()
             packet_count = 0
             thread_stop.clear()
+            thread_pause.clear()
             self.captured_view.setRowCount(0)
             self.treeWidget.clear()
             self.hex_browser.clear()
