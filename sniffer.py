@@ -5,7 +5,8 @@ import time
 from PyQt6.QtCore import Qt
 
 from MainWindow import Ui_MainWindow
-from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QTreeWidgetItem
+from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QDialog, \
+    QTreeWidgetItem, QFileDialog
 from ipconfig import get_interfaces_name
 from scapy.all import *
 
@@ -43,6 +44,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.sniff_button.clicked.connect(self.sniff_button_logic)
         self.pause_button.clicked.connect(self.pause_button_logic)
         self.stop_button.clicked.connect(self.stop_button_logic)
+        self.save_button.clicked.connect(self.save_button_logic)
         self.captured_view.itemClicked.connect(self.display_current_packet)
         # self.resniff_button.clicked.connect(self.resniff_button_logic)
 
@@ -181,6 +183,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.sniff_button.setEnabled(False)
         self.stop_button.setEnabled(True)
         self.pause_button.setEnabled(True)
+        self.save_button.setEnabled(False)
 
 
     # # 暂停按钮的逻辑
@@ -203,7 +206,22 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.stop_button.setEnabled(False)
         self.sniff_button.setEnabled(True)
         self.pause_button.setEnabled(False)
+        self.save_button.setEnabled(True)
 
+    def save_button_logic(self):
+        if packet_count == 0:
+            dlg = QDialog(self)
+            dlg.exec()
+            pass
+        file_dialog = QFileDialog()
+        file_dialog.setDefaultSuffix(".pacp")
+        file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)  # 设置保存文件模式
+        file_path, _ = file_dialog.getSaveFileName()
+        if file_path:
+            wrpcap(file_path, packet_list)
+            dlg = QDialog(self)
+            dlg.setWindowTitle("保存成功！")
+            dlg.exec()
 
 
 if __name__ == "__main__":
