@@ -59,7 +59,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.append(packet)
             packet_count += 1
 
-            protocal_list = ['HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
+            protocal_list = ['ICMPv6', 'HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', 'Unknown']
             protocal_name = ''
 
             source = ''
@@ -97,7 +97,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
     def display_current_packet(self):
         global packet_list
         row = self.captured_view.currentRow()
-        packet = packet_list[row - 1]
+        packet = packet_list[row]
 
         # 展示窗口初始化
         self.treeWidget.clear()
