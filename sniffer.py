@@ -2,11 +2,13 @@ import sys
 import threading
 import time
 
+from scapy.utils import wrpcap
+
 from MainWindow import Ui_MainWindow
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox, QAbstractItemView, QDialog, \
-    QTreeWidgetItem, QFileDialog
+    QTreeWidgetItem, QFileDialog, QDialogButtonBox
 
 from psutil import net_if_addrs
 
@@ -40,6 +42,21 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.captured_view.setColumnWidth(5, 50)
         self.captured_view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.captured_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.captured_view.setStyleSheet("""
+        QTableWidget::item:hover {
+        color: black;
+        background-color: #DAEEFF;
+        }
+        """)
+
+        # 初始化TreeWidget
+        # self.treeWidget.setStyle()
+        self.treeWidget.setStyleSheet("""
+        QTreeWidget::item:hover {
+        color: black;
+        background-color: #DAEEFF;
+        }
+        """)
 
         # 连接信号槽函数
         self.sniff_button.clicked.connect(self.sniff_button_logic)
@@ -47,19 +64,18 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         self.stop_button.clicked.connect(self.stop_button_logic)
         self.save_button.clicked.connect(self.save_button_logic)
         self.captured_view.itemClicked.connect(self.display_current_packet)
-        # self.resniff_button.clicked.connect(self.resniff_button_logic)
 
 
     # 下拉框添加网卡
     def display_interfaces_list(self):
-        interifaces_list = net_if_addrs().keys()
-        self.interfaces_combo.addItems(interifaces_list)
+        self.interfaces_combo.addItems(net_if_addrs().keys())
 
 
     def sniff_packet(self):
         global thread_stop
         sniff(prn=self.add_packet, iface=self.interfaces_combo.currentText(),
               stop_filter=lambda pkt: thread_stop.is_set(), filter = self.filter.text())
+
 
     # 数据包展示
     def add_packet(self, packet):
@@ -69,7 +85,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
             packet_list.append(packet)
             packet_count += 1
 
-            protocal_list = ['ICMPv6', 'HTTP', 'DNS', 'TCP', 'UDP', 'ICMP', 'DHCP', 'DHCP6', 'IPv6', 'IP', 'ARP', 'Ether', '802.3', 'Unknown']
+            protocal_list = ['ICMPv6', 'DNS', 'TCP', 'UDP', 'ICMP', 'IPv6', 'IP', 'ARP', 'Ether', '802.3', 'Unknown']
             protocal_name = ''
 
             source = ''
@@ -215,8 +231,8 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
         file_path, _ = file_dialog.getSaveFileName()
         if file_path:
             wrpcap(file_path, packet_list)
-            dlg = QDialog(self)
-            dlg.setWindowTitle("保存成功！")
+            dlg = QMessageBox(self)
+            dlg.setText("保存成功")
             dlg.exec()
 
 
