@@ -81,7 +81,7 @@ class SnifferWindow(QMainWindow, Ui_MainWindow):
                 elif 'IP' in packet:
                     source = packet[IP].src
                     destination = packet[IP].dst
-
+            # 时间
             packet_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(packet.time))
             length = str(len(packet))
             info = packet.summary()
